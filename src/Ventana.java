@@ -9,19 +9,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.*;
 
-public class Ventana extends JFrame implements KeyListener {
+public class Ventana extends JFrame  {
 	
 	JPanel panel = new JPanel();
 	Packman pacPanel = new Packman();
 	JPanel panelNorte = new JPanel();
 	JPanel menu = new JPanel();
 	
+	int nivel = 1;
+	
+	int timeDelay = 100;
+	
 	int direccion;
 	float tiempo;
 	JLabel lblCronometro = new JLabel();
+	
+	String keylogger;
 	
 	
 	Player jugador1 = new Player(60,110,10,10,new Color(0,255,0),10);
@@ -29,14 +36,21 @@ public class Ventana extends JFrame implements KeyListener {
 	
 	Timer timer;
 	
+	int enemigosDropeados;
+	int dropDelay;
+	
+	
 	
 	public Ventana()
 	{	
 		
-		direccion = 1;
-		pacPanel.addPlayer(jugador1);
+		keylogger = "";
+		dropDelay = 0;
+		enemigosDropeados = 0;
+		
+		
 				
-		 int delay = 120;
+		 int delay = 60;
 	        
 	        timer = new Timer(delay, ciclo);
 	        
@@ -50,7 +64,7 @@ public class Ventana extends JFrame implements KeyListener {
 		
 		this.setVisible(true);
 		this.addKeyListener(pacPanel);
-		this.addKeyListener(this);
+		
 		
 		
 		
@@ -66,9 +80,24 @@ public class Ventana extends JFrame implements KeyListener {
         public void actionPerformed(ActionEvent evt) {
         	
         	
+        	dropDelay ++;
+        	if(pacPanel.isNewLevel())
+        	{
+        		enemigosDropeados = 0;
+        		timeDelay-=20;
+        		nivel++;
+        		pacPanel.setNewLevel(false);
+        	}
         	
-    		tiempo+=0.12;
-    		lblCronometro.setText("tiempo Transcurrido: " + Integer.toString((int)tiempo));
+        	if(dropDelay>timeDelay && enemigosDropeados<10)
+        	{
+        		pacPanel.addEnemy(new Enemigo());
+				enemigosDropeados++;
+				dropDelay= 0;
+        	}
+        	
+    		tiempo+=0.06;
+    		lblCronometro.setText("tiempo Transcurrido: " + Integer.toString((int)tiempo ) + "          nivel: " + nivel);
         	pacPanel.repaint();
     		
         	
@@ -107,6 +136,10 @@ public class Ventana extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				
+				pacPanel.addEnemy(new Enemigo());
+				enemigosDropeados++;
+				
 				panelNorte.setLayout(new GridLayout(1,4));
 				lblCronometro.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
 				panelNorte.add(lblCronometro);
@@ -142,90 +175,6 @@ public class Ventana extends JFrame implements KeyListener {
 		
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public boolean colicionMundial()
-	{
-		for (Player objeto : pacPanel.getJugadores()) {
-			
-			if(objeto != null && !objeto.equals(jugador1) && jugador1.intersects(objeto))
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-		
-		
-		if(e.getKeyCode() == 38)
-		{
-			jugador1.setPosY(jugador1.getPosY()-jugador1.getVelocidad());
-		
-			if(!colicionMundial())
-			{
-				direccion = 1;
-			}
-			
-			jugador1.setPosY(jugador1.getPosY()+jugador1.getVelocidad());
-			
-		}
-		
-		if(e.getKeyCode() == 40)
-		{
-			jugador1.setPosY(jugador1.getPosY()+jugador1.getVelocidad());
-			
-			if(!colicionMundial())
-			{
-				direccion = 2;
-			}
-			
-			jugador1.setPosY(jugador1.getPosY()-jugador1.getVelocidad());
-		}
-		
-		if(e.getKeyCode() == 37)
-		{
-			jugador1.setPosX(jugador1.getPosX()-jugador1.getVelocidad());
-			
-			if(!colicionMundial())
-			{
-				direccion = 3;
-			}
-			jugador1.setPosX(jugador1.getPosX()+jugador1.getVelocidad());
-			
-		}
-		
-		if(e.getKeyCode() == 39)
-		{
-			jugador1.setPosX(jugador1.getPosX()+jugador1.getVelocidad());
-			if(!colicionMundial())
-			{
-				direccion = 4;
-			}
-			jugador1.setPosX(jugador1.getPosX()-jugador1.getVelocidad());
-			
-		} 
-		
-	
-		
-		
-		
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		
-	}
 
 }
 

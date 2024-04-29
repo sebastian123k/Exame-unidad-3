@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -13,10 +15,26 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Packman extends JPanel implements KeyListener{
+	
+	char letra;
+	int playerHealth;
+	int focus;
+	int levelPass;
+	int velocidad;
+	
+	boolean newLevel = false;
 
 	
-	Player[] jugadores;
-	int jugadorIndex;
+	public boolean isNewLevel() {
+		return newLevel;
+	}
+
+	public void setNewLevel(boolean newLevel) {
+		this.newLevel = newLevel;
+	}
+
+	Enemigo[] enemigos;
+	int enemigoIndex;
 	
 	Image[] imagen;
 	
@@ -27,13 +45,19 @@ public class Packman extends JPanel implements KeyListener{
 	
 	public Packman()
 	{
+		velocidad = 2;
+		levelPass = 0;
+		letra = ' ';
+		focus =11;
+		
+		playerHealth = 3;
 		shipAnimationIndex = 0;
 		
 		timer = new Timer(100, ciclo);
 		timer.start();
 	        
-		jugadores = new Player[10];
-		jugadorIndex = 0;
+		enemigos = new Enemigo[10];
+		enemigoIndex = 0;
 		
 		ImageIcon icnFondo = new ImageIcon(getClass().getResource("b_0.jpg"));
 		
@@ -72,6 +96,14 @@ public class Packman extends JPanel implements KeyListener{
 		
 	}
 	
+	public int getPlayerHealth() {
+		return playerHealth;
+	}
+
+	public void setPlayerHealth(int playerHealth) {
+		this.playerHealth = playerHealth;
+	}
+
 	ActionListener ciclo = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
         	
@@ -82,6 +114,47 @@ public class Packman extends JPanel implements KeyListener{
     		{
 				shipAnimationIndex=0;
     		}
+    		
+    		if(levelPass==10)
+    		{
+    			enemigos = new Enemigo[10];
+    			enemigoIndex = 0;
+    			levelPass = 0;
+    			velocidad +=2;
+    			newLevel = true;
+    		}
+    		
+    		for(int i = 0; i<enemigoIndex;i++)
+    		{
+    			
+    			if(enemigos[i]!= null)
+    			{
+    				enemigos[i].setPosY(enemigos[i].getPosY()+velocidad);
+    				
+    			}
+    			
+    		}
+    		
+    		
+    		for(int i = 0; i<enemigoIndex;i++)
+    		{
+    			
+    			if(enemigos[i]!= null && enemigos[i].isVivo() && enemigos[i].getPosY()>600)
+    			{
+    				playerHealth--;
+    				enemigos[i].setVivo(false);
+    				levelPass++;
+    				if(i==focus)
+    				{
+    					focus = 11;
+    				}
+    				
+    				
+    			}
+    			
+    		}
+    		
+    		
     		
         	
         }
@@ -96,46 +169,108 @@ public class Packman extends JPanel implements KeyListener{
 		
 		Graphics g2d = (Graphics2D) g;
 		
-		/*for(int i = 0; i<jugadorIndex;i++)
+		g2d.setColor(new Color(100,100,100));
+		g2d.setFont(new Font(Font.SANS_SERIF,Font.BOLD,30));
+		
+		g2d.drawImage(fondo,0,0,700,700,this);
+		
+		for(int i = 0; i<enemigoIndex;i++)
 		{
 			
-			if(jugadores[i]!= null)
+			if(enemigos[i]!= null && enemigos[i].isVivo())
 			{
-				g2d.setColor(jugadores[i].getColor());
-				g2d.fillRect(jugadores[i].getPosX(),jugadores[i].getPosY(),jugadores[i].getAncho(),jugadores[i].getAlto());
+				
+				 g2d.drawImage(imagen[shipAnimationIndex], enemigos[i].getPosX(),enemigos[i].getPosY(),100,100,this);
+				 if(enemigos[i].isFocus())
+				 {
+					g2d.setColor(new Color(255,0,0));
+				 }
+				 else 
+				 {
+					 g2d.setColor(new Color(100,100,100)); 
+				 }
+				 g2d.drawString(enemigos[i].getPalabra(),enemigos[i].getPosX(),enemigos[i].getPosY());
 			}
 			
 		}
-		*/
-		 g2d.drawImage(fondo,0,0,700,700,this);
+		
+		for(int i = 0;i<playerHealth;i++)
+		{
+			g2d.fillRect((400 + i*50),520, 40,40);
+		}
 		 
 		 g2d.drawImage(imagen[shipAnimationIndex], 300,520,100,100,this);
-		 
+		
 	}
 	
-	public void addPlayer(Player newPlayer)
+	public void addEnemy(Enemigo newEnemy)
 	{
 		
-		jugadores[jugadorIndex] = newPlayer;
-		jugadorIndex++;
-		System.out.println(jugadorIndex);
-		
+		enemigos[enemigoIndex] = newEnemy;
+		enemigoIndex++;
 		
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println( e.getKeyCode());
+		
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
-		
-		
-		
+		letra = e.getKeyChar();
+		if(newLevel == false)
+		{
+			
+			
+			if(focus == 11 )
+			{
+				for(int i = 0; i<enemigoIndex;i++)
+	    		{
+	    			
+					String aux = "";
+					if(enemigos[i].isVivo() && enemigos[i].getPalabra().charAt(0)== letra)
+					{
+						for(int j = 1; j<enemigos[i].getPalabra().length();j++)
+						{
+							aux = aux + enemigos[i].getPalabra().charAt(j);
+						}
+						
+						enemigos[i].setPalabra(aux);
+						enemigos[i].setFocus(true);
+						focus = i;
+						break;
+					
+	    			}
+	    			
+	    		}
+				
+			}
+			else
+			{
+				String aux = "";
+				if(enemigos[focus].getPalabra().charAt(0) == letra)
+				{
+					for(int j = 1; j<enemigos[focus].getPalabra().length();j++)
+					{
+						aux = aux + enemigos[focus].getPalabra().charAt(j);
+					}
+					
+					enemigos[focus].setPalabra(aux);
+					System.out.println(aux);
+					
+					if(enemigos[focus].getPalabra().equals(""))
+					{
+						enemigos[focus].setVivo(false);
+						focus = 11;
+						levelPass++;
+					}
+				}
+			}
+		}		
 	}
 
 	@Override
@@ -146,15 +281,7 @@ public class Packman extends JPanel implements KeyListener{
 
 
 
-	public Player[] getJugadores() {
-		return jugadores;
-	}
 
-
-
-	public void setJugadores(Player[] jugadores) {
-		this.jugadores = jugadores;
-	}
 
 
 	
