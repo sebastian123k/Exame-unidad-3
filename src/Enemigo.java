@@ -2,7 +2,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileReader;
+
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 public class Enemigo {
 	
@@ -12,11 +18,57 @@ public class Enemigo {
 	
 	int level;
 	
+	String imagen ;
+	
+	Timer timer;
 
+	int explocion = 0;
 
 	String palabra;
 
 	public Enemigo(int level) {
+		
+		timer = new Timer(100, ciclo);
+		
+		
+		int random = (int) (Math.random() * 10);
+		
+		switch (random)
+		{
+		case 0:
+			imagen = "asteroid.png";
+			break;
+		case 1:
+			imagen = "boarder.png";
+			break;
+			
+		case 2:
+			imagen = "core.png";
+			break;
+		case 3:
+			imagen = "cruiser.png";
+			break;
+		case 4:
+			imagen = "fighter.png";
+			break;
+		case 5:
+			imagen = "flamer.png";
+			break;
+		case 6:
+			imagen = "kamikaze.png";
+			break;
+		case 7:
+			imagen = "parafighter.png";
+			break;
+		case 8:
+			imagen = "rocketShip.png";
+			break;
+		case 9:
+			imagen = "shieldShip.png";
+			break;
+		}
+		
+		
 		
 		this.level = level;
 		this.focus = false;
@@ -75,9 +127,70 @@ public class Enemigo {
             System.out.println(ex.toString());
             this.palabra = "error en " + ex.toString();
         }
+	
 		
 		
 	}
+	
+	ActionListener ciclo = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+        	
+        	explocion++;
+        	
+        	
+        
+        	switch (explocion)
+    		{
+    		case 0:
+    			imagen = "boom1.png";
+    			break;
+    		case 1:
+    			imagen = "boom02.png";
+    			break;
+    			
+    		case 2:
+    			imagen = "boom03.png";
+    			break;
+    		case 3:
+    			imagen = "boom04.png";
+    			break;
+    		case 4:
+    			imagen = "boom05.png";
+    			break;
+    		case 5:
+    			imagen = "boom06.png";
+    			break;
+    		case 6:
+    			imagen = "boom07.png";
+    			break;
+    		case 7:
+    			imagen = "boom08.png";
+    			break;
+    		case 8:
+    			imagen = "boom9.png";
+    			break;
+    		case 9:
+    			imagen = "boom10.png";
+    			break;
+    		case 10:
+    			vivo = false;
+    			break;
+    		}
+
+        }};
+	
+	
+	
+	public String getImagen() {
+		return imagen;
+	}
+
+
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
+
+
 	public int getLevel() {
 		return level;
 	}
@@ -98,8 +211,15 @@ public class Enemigo {
 		return vivo;
 	}
 
-	public void setVivo(boolean vivo) {
-		this.vivo = vivo;
+	public void setVivo(boolean vivito) {
+		if(vivito == false)
+		{
+			timer.start();
+			posX-=100;
+			posY-=100;
+			imagen = "boom1.png";
+			
+		}
 	}
 
 	public int getPosX() {

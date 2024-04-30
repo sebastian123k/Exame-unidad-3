@@ -9,11 +9,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 
+import javax.print.attribute.standard.Media;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+
 
 public class Packman extends JPanel implements KeyListener{
 	
@@ -23,39 +30,17 @@ public class Packman extends JPanel implements KeyListener{
 	int levelPass;
 	int velocidad;
 	
-	int puntaje;
+	int puntaje = 0;
+	
+	boolean efectos = true;
 	boolean newLevel = false;
 	
 	boolean newGame = false;
 	
-	
-
-	
-	public boolean isNewGame() {
-		return newGame;
-	}
-
-	public void setNewGame(boolean newGame) {
-		this.newGame = newGame;
-	}
-
-	public boolean isNewLevel() {
-		return newLevel;
-	}
-
-	public void setNewLevel(boolean newLevel) {
-		this.newLevel = newLevel;
-	}
-	
 	int enemylevel = 6;
 
-	public int getEnemylevel() {
-		return enemylevel;
-	}
-
-	public void setEnemylevel(int enemylevel) {
-		this.enemylevel = enemylevel;
-	}
+	
+	
 
 	Enemigo[] enemigos;
 	int enemigoIndex;
@@ -69,6 +54,8 @@ public class Packman extends JPanel implements KeyListener{
 	
 	public Packman()
 	{
+		
+		
 		puntaje = 0;
 		velocidad = 2;
 		levelPass = 0;
@@ -84,7 +71,7 @@ public class Packman extends JPanel implements KeyListener{
 		enemigos = new Enemigo[10];
 		enemigoIndex = 0;
 		
-		ImageIcon icnFondo = new ImageIcon(getClass().getResource("b_0.jpg"));
+		ImageIcon icnFondo = new ImageIcon(getClass().getResource("bg.png"));
 		
 		fondo = icnFondo.getImage();
 		
@@ -135,6 +122,7 @@ public class Packman extends JPanel implements KeyListener{
         	
         	
         	
+        	
     		shipAnimationIndex++;
     		if(shipAnimationIndex>17)
     		{
@@ -146,7 +134,7 @@ public class Packman extends JPanel implements KeyListener{
     			enemigos = new Enemigo[10];
     			enemigoIndex = 0;
     			levelPass = 0;
-    			velocidad +=2;
+    			velocidad +=3;
     			enemylevel +=2;
     			newLevel = true;
     			puntaje += 10;
@@ -218,7 +206,9 @@ public class Packman extends JPanel implements KeyListener{
         }
     };
 	
-
+    int fposy2 = -700;
+    int fposy = 0;
+    
 
 	@Override
 	public void paint(Graphics g) {
@@ -227,10 +217,23 @@ public class Packman extends JPanel implements KeyListener{
 		
 		Graphics g2d = (Graphics2D) g;
 		
-		g2d.setColor(new Color(100,100,100));
-		g2d.setFont(new Font(Font.SANS_SERIF,Font.BOLD,30));
+		g2d.setColor(Color.white);
+		g2d.setFont(new Font(Font.SANS_SERIF,Font.BOLD,25));
 		
-		g2d.drawImage(fondo,0,0,700,700,this);
+		fposy2+=5;
+		fposy+=5;
+		
+		if(fposy>700)
+		{
+			fposy = -700+5;
+		}
+		if(fposy2>700)
+		{
+			fposy2 = -700+5;
+		}
+		
+		g2d.drawImage(fondo,0,fposy2,700,700,this);
+		g2d.drawImage(fondo,0,fposy,700,700,this);
 		
 		for(int i = 0; i<enemigoIndex;i++)
 		{
@@ -238,23 +241,28 @@ public class Packman extends JPanel implements KeyListener{
 			if(enemigos[i]!= null && enemigos[i].isVivo())
 			{
 				
-				 g2d.drawImage(imagen[shipAnimationIndex], enemigos[i].getPosX(),enemigos[i].getPosY(),100,100,this);
 				 if(enemigos[i].isFocus())
 				 {
 					g2d.setColor(new Color(255,0,0));
 				 }
 				 else 
 				 {
-					 g2d.setColor(new Color(100,100,100)); 
-				 }
-				 g2d.drawString(enemigos[i].getPalabra(),enemigos[i].getPosX(),enemigos[i].getPosY());
+					 g2d.setColor(Color.white); 
+				 } 
+				 
+				 g2d.drawImage(new ImageIcon(getClass().getResource(enemigos[i].getImagen())).getImage(), enemigos[i].getPosX(),enemigos[i].getPosY(),this);
+			
+				 g2d.drawString(enemigos[i].getPalabra(),enemigos[i].getPosX(),enemigos[i].getPosY()+50);
+				 
+				 
 			}
 			
 		}
 		
 		for(int i = 0;i<playerHealth;i++)
 		{
-			g2d.fillRect((400 + i*50),520, 40,40);
+			
+			g2d.drawImage(new ImageIcon(getClass().getResource("life.png")).getImage(),(490 + i*50),590, 40,40,this);
 		}
 		 
 		 g2d.drawImage(imagen[shipAnimationIndex], 300,520,100,100,this);
@@ -267,6 +275,40 @@ public class Packman extends JPanel implements KeyListener{
 		enemigos[enemigoIndex] = newEnemy;
 		enemigoIndex++;
 		
+	}
+	
+	public boolean isNewGame() {
+		return newGame;
+	}
+
+	public void setNewGame(boolean newGame) {
+		this.newGame = newGame;
+	}
+
+	public boolean isNewLevel() {
+		return newLevel;
+	}
+
+	public void setNewLevel(boolean newLevel) {
+		this.newLevel = newLevel;
+	}
+	
+	
+
+	public int getEnemylevel() {
+		return enemylevel;
+	}
+
+	public void setEnemylevel(int enemylevel) {
+		this.enemylevel = enemylevel;
+	}
+
+	public boolean isEfectos() {
+		return efectos;
+	}
+
+	public void setEfectos(boolean efectos) {
+		this.efectos = efectos;
 	}
 
 	@Override
@@ -325,6 +367,11 @@ public class Packman extends JPanel implements KeyListener{
 						puntaje++;
 						enemigos[focus].setVivo(false);
 						focus = 11;
+						if(efectos)
+						{
+							reproducirAudio("laser.wav");
+						}
+						
 						levelPass++;
 					}
 				}
@@ -346,6 +393,29 @@ public class Packman extends JPanel implements KeyListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public static void reproducirAudio(String ruta) {
+        try {
+            
+            File archivoAudio = new File(ruta);
+
+   
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(archivoAudio);
+
+           
+            Clip clip = AudioSystem.getClip();
+
+          
+            clip.open(audioInputStream);
+
+            clip.start();
+
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+    }
+	
+	
 
 
 
