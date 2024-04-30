@@ -10,16 +10,22 @@ public class Enemigo {
 	
 	int posX,posY;
 	
+	int level;
+	
+
+
 	String palabra;
 
-	public Enemigo() {
+	public Enemigo(int level) {
 		
+		this.level = level;
 		this.focus = false;
 		this.vivo = true;
 		
-		int randomPos = (int) (Math.random() * 650);
+		int randomPos = (int) (Math.random() * 600);
 		this.posX = randomPos;
 		this.posY = 0;
+	
 		
 		int randomIndex;
 		
@@ -32,8 +38,35 @@ public class Enemigo {
             
             JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-            randomIndex = (int) (Math.random() * jsonObject.getAsJsonArray("users").size());
-            this.palabra = jsonObject.getAsJsonArray("users").get(randomIndex).getAsJsonObject().get("username").getAsString();
+           
+            
+           
+            do {
+            	
+            	 randomIndex = (int) (Math.random() * jsonObject.getAsJsonArray("users").size());
+            	 	
+            	  this.palabra = jsonObject.getAsJsonArray("users").get(randomIndex).getAsJsonObject().get("username").getAsString();
+            	  
+            	  if(this.palabra.length()>level)
+            	  {
+            		  this.palabra = jsonObject.getAsJsonArray("users").get(randomIndex).getAsJsonObject().get("firstName").getAsString();
+            	  }
+            	  
+            	  if(this.palabra.length()>level)
+            	  {
+            		  this.palabra = jsonObject.getAsJsonArray("users").get(randomIndex).getAsJsonObject().get("lastName").getAsString();
+            	  }
+            	  
+            	  if(this.palabra.length()>level)
+            	  {
+            		  this.palabra = jsonObject.getAsJsonArray("users").get(randomIndex).getAsJsonObject().get("eyeColor").getAsString();
+            	  }
+            	  
+            	  
+            } while(this.palabra.length()>level);
+          
+            
+            
             
             
            
@@ -44,6 +77,13 @@ public class Enemigo {
         }
 		
 		
+	}
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	
 	public boolean isFocus() {

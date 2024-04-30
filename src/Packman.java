@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -22,15 +23,38 @@ public class Packman extends JPanel implements KeyListener{
 	int levelPass;
 	int velocidad;
 	
+	int puntaje;
 	boolean newLevel = false;
+	
+	boolean newGame = false;
+	
+	
 
 	
+	public boolean isNewGame() {
+		return newGame;
+	}
+
+	public void setNewGame(boolean newGame) {
+		this.newGame = newGame;
+	}
+
 	public boolean isNewLevel() {
 		return newLevel;
 	}
 
 	public void setNewLevel(boolean newLevel) {
 		this.newLevel = newLevel;
+	}
+	
+	int enemylevel = 6;
+
+	public int getEnemylevel() {
+		return enemylevel;
+	}
+
+	public void setEnemylevel(int enemylevel) {
+		this.enemylevel = enemylevel;
 	}
 
 	Enemigo[] enemigos;
@@ -45,6 +69,7 @@ public class Packman extends JPanel implements KeyListener{
 	
 	public Packman()
 	{
+		puntaje = 0;
 		velocidad = 2;
 		levelPass = 0;
 		letra = ' ';
@@ -89,6 +114,7 @@ public class Packman extends JPanel implements KeyListener{
 		for(int i=0;i<18;i++)
 		{
 			imagen[i] = icono[i].getImage();
+			
 		}
 		
 		
@@ -121,7 +147,17 @@ public class Packman extends JPanel implements KeyListener{
     			enemigoIndex = 0;
     			levelPass = 0;
     			velocidad +=2;
+    			enemylevel +=2;
     			newLevel = true;
+    			puntaje += 10;
+    		}
+    		
+    		for(int i = 0; i<enemigoIndex;i++)
+    		{
+    			
+    			
+    			enemigos[i].setLevel(enemylevel);
+    					
     		}
     		
     		for(int i = 0; i<enemigoIndex;i++)
@@ -147,6 +183,28 @@ public class Packman extends JPanel implements KeyListener{
     				if(i==focus)
     				{
     					focus = 11;
+    				}
+    				
+    				if (playerHealth == 0)
+    				{
+    					
+    					String GameOver = JOptionPane.showInputDialog(null, "GAME OVER      Ingresa tu nombre" );
+    					enemylevel = 6;
+    					velocidad = 2;
+    					levelPass = 0;
+    					letra = ' ';
+    					focus =11;
+    					puntaje = 0;
+    					
+    					playerHealth = 3;
+    					shipAnimationIndex = 0;
+    					
+    					timer = new Timer(100, ciclo);
+    					timer.start();
+    				        
+    					enemigos = new Enemigo[10];
+    					enemigoIndex = 0;
+    					newGame = true;
     				}
     				
     				
@@ -264,6 +322,7 @@ public class Packman extends JPanel implements KeyListener{
 					
 					if(enemigos[focus].getPalabra().equals(""))
 					{
+						puntaje++;
 						enemigos[focus].setVivo(false);
 						focus = 11;
 						levelPass++;
@@ -271,6 +330,15 @@ public class Packman extends JPanel implements KeyListener{
 				}
 			}
 		}		
+	}
+	
+
+	public int getPuntaje() {
+		return puntaje;
+	}
+
+	public void setPuntaje(int puntaje) {
+		this.puntaje = puntaje;
 	}
 
 	@Override

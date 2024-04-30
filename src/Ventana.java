@@ -12,17 +12,19 @@ import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.ArrayList;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class Ventana extends JFrame  {
 	
 	JPanel panel = new JPanel();
 	Packman pacPanel = new Packman();
 	JPanel panelNorte = new JPanel();
+	JPanel Audio = new JPanel();
 	JPanel menu = new JPanel();
 	
 	int nivel = 1;
 	
-	int timeDelay = 100;
+	int timeDelay = 40;
 	
 	int direccion;
 	float tiempo;
@@ -84,33 +86,41 @@ public class Ventana extends JFrame  {
         	if(pacPanel.isNewLevel())
         	{
         		enemigosDropeados = 0;
-        		timeDelay-=20;
+        		timeDelay-=8;
         		nivel++;
         		pacPanel.setNewLevel(false);
         	}
         	
+        	if(pacPanel.isNewGame())
+        	{
+        		nivel = 1;
+        		tiempo = (float) 0.00; 
+        		timeDelay = 80;
+        		timer.stop();
+				panel.remove(pacPanel);
+				panel.add(menu,BorderLayout.CENTER);
+				panel.repaint();
+				panel.revalidate();
+				pacPanel.setNewGame(false);
+				enemigosDropeados=0;
+        	}
+        	
         	if(dropDelay>timeDelay && enemigosDropeados<10)
         	{
-        		pacPanel.addEnemy(new Enemigo());
+        		pacPanel.addEnemy(new Enemigo(pacPanel.getEnemylevel()));
 				enemigosDropeados++;
 				dropDelay= 0;
         	}
         	
     		tiempo+=0.06;
-    		lblCronometro.setText("tiempo Transcurrido: " + Integer.toString((int)tiempo ) + "          nivel: " + nivel);
+    		lblCronometro.setText("Time " + Integer.toString((int)tiempo ) + "    Level: " + nivel + "   Score: " + pacPanel.getPuntaje());
         	pacPanel.repaint();
     		
         	
         }
     };
     
-    public void reiniciar()
-    {
-    	
-    	jugador1.setPosX(60); 
-    	jugador1.setPosY(110);
-    	tiempo = 0;
-    }
+
 	
 	public void agregarElementos() {
 		
@@ -121,7 +131,7 @@ public class Ventana extends JFrame  {
 		JButton btnActivarSonido = new JButton("sonido");
 		btnActivarSonido.setFocusable(false);
 		btnActivarSonido.setBounds(500,20,50,50);
-		JButton btnActivarEfectos = new JButton("sonido");
+		JButton btnActivarEfectos = new JButton("efectos");
 		btnActivarEfectos.setFocusable(false);
 		btnActivarEfectos.setBounds(560,20,50,50);
 
@@ -137,12 +147,26 @@ public class Ventana extends JFrame  {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				
-				pacPanel.addEnemy(new Enemigo());
+				pacPanel.addEnemy(new Enemigo(6));
 				enemigosDropeados++;
 				
-				panelNorte.setLayout(new GridLayout(1,4));
+				Audio.setLayout(new GridLayout(1,2));
+				panelNorte.setLayout(new GridLayout(1,2));
+				
+				
 				lblCronometro.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
+				lblCronometro.setBackground(Color.black);
+				lblCronometro.setForeground(Color.white);
+				lblCronometro.setOpaque(true);
+				lblCronometro.setBorder(new LineBorder(Color.black,15));
+				
+				Audio.add(btnActivarSonido);
+				Audio.add(btnActivarEfectos);
+				
 				panelNorte.add(lblCronometro);
+				panelNorte.add(Audio);
+				
+				
 				panel.add(panelNorte,BorderLayout.NORTH);
 				
 				timer.start();
@@ -152,6 +176,7 @@ public class Ventana extends JFrame  {
 				panel.revalidate();
 				
 			}});
+		
 		
 		menu.setLayout(null);
 		
